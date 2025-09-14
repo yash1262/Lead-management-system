@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     
-    <!-- Google Fonts -->
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,14 +17,14 @@
     <title>Lead Management System</title>
     
     <style>
-      /* Loading styles for initial page load */
+      
       #initial-loading {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(135deg, #f00d0d 0%, #ffffff 100%);
+        background: linear-gradient(135deg, #2458e7 0%, #3437ff 100%);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -67,7 +67,7 @@
         50% { opacity: 0.6; }
       }
       
-      /* Hide initial loading once React app loads */
+      
       .app-loaded #initial-loading {
         display: none;
       }
@@ -76,25 +76,25 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
-    <!-- Initial loading screen -->
+    
     <div id="initial-loading">
       <div class="logo">LeadManager</div>
       <div class="spinner"></div>
       <div class="message">Loading your dashboard...</div>
     </div>
     
-    <!-- React app root -->
+    
     <div id="root"></div>
     
     <script>
-      // Hide initial loading screen once React app is ready
+      
       window.addEventListener('load', function() {
         setTimeout(function() {
           document.body.classList.add('app-loaded');
         }, 500);
       });
       
-      // Service Worker Registration (optional)
+      
       if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
