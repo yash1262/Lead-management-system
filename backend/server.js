@@ -22,12 +22,13 @@ async function connectDatabase() {
     });
     console.log(`MongoDB connected: ${MONGO_URI}`);
   } catch (err) {
-    console.error('MongoDB connection error:', err);
+    console.error('MongoDB connection error:', err.message);
     console.log('Falling back to in-memory MongoDB for development...');
     try {
       const { MongoMemoryServer } = require('mongodb-memory-server');
       const mem = await MongoMemoryServer.create();
       const uri = mem.getUri();
+      console.log('In-memory MongoDB URI:', uri);
       await mongoose.connect(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -35,7 +36,8 @@ async function connectDatabase() {
       console.log('Connected to in-memory MongoDB instance');
     } catch (memErr) {
       console.error('Failed to start in-memory MongoDB:', memErr);
-      process.exit(1);
+      console.log('Server will continue without database connection');
+      // Don't exit, let the server start without database
     }
   }
 }
@@ -77,13 +79,17 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadRoutes);
-
-// Health check
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', message: 'Server is running' });
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -96,10 +102,14 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
+// Start server immediately, then connect to database
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/api/health`);
+});
+
+// Connect to database in background
 (async () => {
   await connectDatabase();
   await ensureTestUser();
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
 })();

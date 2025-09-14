@@ -28,20 +28,40 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(response.data.user));
       } else {
         setUser(null);
+        localStorage.removeItem('user');
       }
     } catch (error) {
-      // Fallback: check localStorage
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          const user = JSON.parse(storedUser);
-          setUser(user);
-        } catch (err) {
-          localStorage.removeItem('user');
+      console.log('Auth check failed:', error.response?.status, error.response?.data?.message);
+      
+      // If it's a 401 (unauthorized), that's expected when not logged in
+      if (error.response?.status === 401) {
+        // Check localStorage as fallback
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          try {
+            const user = JSON.parse(storedUser);
+            setUser(user);
+          } catch (err) {
+            localStorage.removeItem('user');
+            setUser(null);
+          }
+        } else {
           setUser(null);
         }
       } else {
-        setUser(null);
+        // For other errors (network, server errors), still check localStorage
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          try {
+            const user = JSON.parse(storedUser);
+            setUser(user);
+          } catch (err) {
+            localStorage.removeItem('user');
+            setUser(null);
+          }
+        } else {
+          setUser(null);
+        }
       }
     } finally {
       setLoading(false);

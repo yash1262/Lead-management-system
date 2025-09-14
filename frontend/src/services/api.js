@@ -44,8 +44,8 @@ api.interceptors.response.use(
       }
     }
     
-    // Handle 401 errors globally
-    if (error.response?.status === 401) {
+    // Handle 401 errors globally (but not for auth/me endpoint)
+    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/me')) {
       // User is not authenticated, redirect to login
       window.location.href = '/login';
     }
